@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+	"helper",
+	"extractor"
+]
