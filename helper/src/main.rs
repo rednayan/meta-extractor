@@ -1,4 +1,4 @@
 use extractor;
 fn main() {
-   extractor::extract();
+   extractor::example_main();
 }
