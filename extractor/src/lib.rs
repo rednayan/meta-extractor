@@ -2,10 +2,35 @@ use gstreamer as gst;
 use gstreamer_pbutils as gst_pbutils;
 use gst::prelude::*;
 use std::env;
+use std::ffi::CStr;
+use std::os::raw::c_char;
 
 use anyhow::Error;
-use derive_more::{Display, Error};
 use gst_pbutils::{prelude::*, DiscovererInfo, DiscovererStreamInfo};
+use derive_more::{Display, Error};
+pub struct MetaData {
+    uri: String,
+    audio_codec: String,
+    max_bitrate: u32,
+    bitrate: u32,
+    language_code: String,
+    title: String,
+    artist: String,
+    album_artist: String,
+    album: String,
+    copyright: String,
+    comment: String,
+    description: String,
+    datetime: String,
+    date: String,
+    encoder: String,
+    genre: String,
+    image: String,
+    keywords: String,
+    private_qt_tag: String,
+    container_format: String,
+    video_codec: String 
+}
 #[derive(Debug, Display, Error)]
 #[display(fmt = "Discoverer error {_0}")]
 struct DiscovererError(#[error(not(source))] &'static str);
@@ -18,7 +43,19 @@ fn print_tags(info: &DiscovererInfo) {
         Some(taglist) => {
             println!("Tags:");
             for tag in taglist.iter() {
-                println!("{:?}", tag);
+                let tag_str = tag.1.transform::<String>();
+                match tag_str {
+                    Ok(value) => { 
+                        let str_value = value.get::<&str>().unwrap();
+                        let mut null_terminated_string = str_value.to_owned();
+                        null_terminated_string.push('\0');
+                        let c_str = std::ffi::CStr::from_bytes_with_nul(null_terminated_string.as_bytes())
+                        .map_err(|e| format!("Error creating CStr from byte array: {}", e)).unwrap();
+                        let rust_string = c_str.to_string_lossy().to_string(); 
+                        println!("{}",rust_string);
+                    },
+                    Err(_) => println!("there has been an error")
+                }
             }
         }
         None => {

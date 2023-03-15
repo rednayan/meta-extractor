@@ -1,4 +1,4 @@
-use actix_web::{get,post,web,Responder,HttpResponse};
+use actix_web::{post,web,Responder,HttpResponse};
 
 use super::model::{VideoUri};
 use crate::AppState;
@@ -14,12 +14,12 @@ async fn post_meta_data(pool_data: web::Data<AppState>,param_obj: web::Json<Vide
         date, encoder, genre, image, keywords, private_qt_tag, container_format,
         video_codec
     ) VALUES (
-        'http://example.com/my_media_file.mp4', 'AAC', 320, 192, 'en', 'My Awesome Video',
+        '{}', 'AAC', 320, 192, 'en', 'My Awesome Video',
         'John Smith', 'The Band', 'The Best Album', '© 2023 My Company', 'This is a great video',
         'A longer description of the video and its contents', '2023-03-15 14:30:00',
         '2023-03-15', 'FFmpeg', 'Action', 'http://example.com/my_video_thumbnail.jpg',
         'video, awesome, cool', 'my-private-tag', 'MP4', 'H.264'
-    );");
+    );",param_obj.uri);
     sqlx::query(&query).execute(&*pool).await.expect("there is an error");
     return HttpResponse::Ok().json("video added to database");
 }

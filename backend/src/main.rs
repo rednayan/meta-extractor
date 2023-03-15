@@ -19,8 +19,9 @@ async fn index() -> String {
 async fn main() -> std::io::Result<()> {
    dotenv().ok();
    let database_uri: String = std::env::var("DATABASE_URI").unwrap();
+   extractor::example_main();
+   
    let pool = MySqlPool::connect(&database_uri).await;
-
    let app_data = web::Data::new(AppState {pool: match pool {
       Ok(val) => val,
       Err(_) => exit(1)
@@ -34,5 +35,5 @@ async fn main() -> std::io::Result<()> {
       .bind(("127.0.0.1",6942))?
       .run()
       .await
-   // extractor::example_main();
 }
+
