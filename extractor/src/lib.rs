@@ -16,13 +16,13 @@ fn print_tags(info: &DiscovererInfo) {
     let tags = info.tags();
     match tags {
         Some(taglist) => {
-            println!("  Tags:");
+            println!("Tags:");
             for tag in taglist.iter() {
                 println!("{:?}", tag);
             }
         }
         None => {
-            println!("  no tags");
+            println!("no tags");
         }
     }
 }
