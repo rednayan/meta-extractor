@@ -1,12 +1,11 @@
 use serde::{Serialize,Deserialize};
-use chrono::prelude::*;
 
 #[derive(Deserialize)]
 pub struct VideoUri {
     pub uri: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 pub struct MetaData {
     uri: String,
     audio_codec: String,

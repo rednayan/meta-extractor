@@ -1,4 +1,5 @@
 use actix_web::{post,web,Responder,HttpResponse};
+use std::{collections::HashMap, hash::Hash, ptr::hash};
 
 use super::model::{VideoUri};
 use crate::AppState;
@@ -22,8 +23,12 @@ async fn post_meta_data(pool_data: web::Data<AppState>,param_obj: web::Json<Vide
     // );",param_obj.uri);
     // sqlx::query(&query).execute(&*pool).await.expect("there is an error");
 
+    let mut hash_tag: HashMap<&String,&String> = HashMap::new(); 
     let tags = extractor::extract(&param_obj.uri);
-    return HttpResponse::Ok().json(tags);
+    for tag in tags.iter() {
+        hash_tag.insert(&tag.meta_title, &tag.meta_value);
+    }
+    return HttpResponse::Ok().json(hash_tag);
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
