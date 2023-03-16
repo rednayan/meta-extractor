@@ -97,7 +97,7 @@ async fn post_meta_data(pool_data: web::Data<AppState>,param_obj: web::Json<Vide
     if let Some(u) = hash_tag.get("date") {
         date.push_str(u);
     }else {
-        date.push_str("NULL");
+        date.push_str("1979-01-01");
     }
     if let Some(u) = hash_tag.get("encoder") {
         encoder.push_str(u);
