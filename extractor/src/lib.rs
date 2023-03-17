@@ -16,13 +16,15 @@ pub struct Meta {
 }
 
 fn get_tags(info: &DiscovererInfo) -> Vec<Meta> {
-    let tags = info.tags();
-    let taglist = match tags {
-        Some(taglist) => taglist,
-        None => std::process::exit(1)
+    let tags = match info.tags() {
+        Some(tag) => tag,
+        None => {
+            eprint!("ERROR: No tags found , try again");
+            info.tags().unwrap()
+        }
     };
     let mut tags_vec :Vec<Meta> = Vec::new();
-    for tag in taglist.iter() {
+    for tag in tags.iter() {
         let  tag_str = tag.1.transform::<String>();
         let meta_str = match tag_str {
             Ok(value) => { 
