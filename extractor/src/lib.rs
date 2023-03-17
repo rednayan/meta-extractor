@@ -48,7 +48,7 @@ fn get_tags(info: &DiscovererInfo) -> Vec<Meta> {
 
 fn run_discoverer(uri:&String) -> Result<Vec<Meta>, Error> {
     gst::init()?;
-    let timeout: gst::ClockTime = gst::ClockTime::from_seconds(15);
+    let timeout: gst::ClockTime = gst::ClockTime::from_seconds(60);
     let discoverer = gst_pbutils::Discoverer::new(timeout)?;
     let info = discoverer.discover_uri(uri)?;
     let mut tag_vec: Vec<Meta> = get_tags(&info);
