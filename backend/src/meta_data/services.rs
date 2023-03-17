@@ -2,7 +2,7 @@ use actix_web::{post,web,Responder,HttpResponse};
 use extractor::Meta;
 use std::{collections::HashMap};
 
-use super::model::{VideoUri};
+use super::model::{VideoUri,MetaData};
 use crate::AppState;
 
 
@@ -10,12 +10,23 @@ use crate::AppState;
 async fn post_meta_data(pool_data: web::Data<AppState>,param_obj: web::Json<VideoUri>) -> impl Responder {
     let pool = &pool_data.pool;
 
-    let tags = extract_data(&param_obj.uri).await;
+    let query_string: String = format!("SELECT uri, audio_codec, max_bitrate, bitrate, language_code, title, artist,album_artist, album, copyright, comment, description, encoder, genre, image, keywords, private_qt_tag, container_format,video_codec,duration FROM media_files where uri like '{}'",param_obj.uri);
+
+    let meta_from_db: Vec<MetaData> = sqlx::query_as::<_, MetaData>(query_string.as_str())
+    .fetch_all(pool)
+    .await.expect("ERROR: error retrieving data from database");
+
+    if meta_from_db.len() != 0 {         
+        return HttpResponse::Ok().json(meta_from_db);
+    } else {
+    let tags: Vec<Meta> = extract_data(&param_obj.uri).await;
+    let mut hash_vec_tag: Vec<HashMap<String,String>> = Vec::new();
 
     let hash_tag: HashMap<String,String> = tags.iter().map(|tag| (tag.meta_title.clone(),tag.meta_value.clone())).collect();
     let null_default: String = "NULL".to_string();
+    
+    
     let date_default: String = "1979-01-01".to_string();
-
     let uri = hash_tag.get("uri").unwrap_or(&null_default);
     let audio_codec = hash_tag.get("audio-codec").unwrap_or(&null_default);
     let max_bitrate = hash_tag.get("maximum-bitrate").and_then(|v| v.parse().ok()).unwrap_or(0);
@@ -39,13 +50,13 @@ async fn post_meta_data(pool_data: web::Data<AppState>,param_obj: web::Json<Vide
     let duration = hash_tag.get("duration").unwrap_or(&null_default);
 
     sqlx::query("INSERT INTO media_files (
-        uri, audio_codec, max_bitrate, bitrate, language_code, title, artist,
-        album_artist, album, copyright, comment, description,
-        date, encoder, genre, image, keywords, private_qt_tag, container_format,
-        video_codec,duration
+            uri, audio_codec, max_bitrate, bitrate, language_code, title, artist,
+            album_artist, album, copyright, comment, description,
+            date, encoder, genre, image, keywords, private_qt_tag, container_format,
+            video_codec,duration
     ) VALUES (
             ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
-        )")
+            )")
         .bind(uri)
         .bind(audio_codec)
         .bind(max_bitrate)
@@ -68,9 +79,11 @@ async fn post_meta_data(pool_data: web::Data<AppState>,param_obj: web::Json<Vide
         .bind(video_codec)
         .bind(duration)
         .execute(&*pool).await.expect("there is an error");
-            
-    return HttpResponse::Ok().json(hash_tag);
-   
+
+        hash_vec_tag.push(hash_tag);
+        return HttpResponse::Ok().json(hash_vec_tag);
+    }
+
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {

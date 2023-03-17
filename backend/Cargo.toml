@@ -11,4 +11,4 @@ actix-web = "4.2.1"
 sqlx = {version ="0.6.2", features = ["runtime-actix-rustls","mysql","macros"]}
 serde = {version = "1.0.145", features = ["derive"]}
 dotenv = "0.15.0"
-chrono = "0.4.24"
+chrono = {version = "0.4.24", features = ["serde"]}

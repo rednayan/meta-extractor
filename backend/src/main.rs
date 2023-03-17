@@ -18,7 +18,7 @@ async fn index() -> String {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
    dotenv().ok();
-   let database_uri: String = std::env::var("DATABASE_URI").unwrap();
+   let database_uri: String = std::env::var("DATABASE_URL").unwrap();
    let pool = MySqlPool::connect(&database_uri).await;
    let app_data = web::Data::new(AppState {pool: match pool {
       Ok(val) => val,
