@@ -12,3 +12,4 @@ sqlx = {version ="0.6.2", features = ["runtime-actix-rustls","mysql","macros"]}
 serde = {version = "1.0.145", features = ["derive"]}
 dotenv = "0.15.0"
 chrono = {version = "0.4.24", features = ["serde"]}
+actix-cors = "0.6.4"
